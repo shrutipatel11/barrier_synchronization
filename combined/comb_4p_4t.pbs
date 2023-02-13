@@ -1,0 +1,32 @@
+#PBS -N comb_4p_4t
+#PBS -l nodes=1:ppn=4+1:ppn=4+1:ppn=4+1:ppn=4
+#PBS -l pmem=1gb
+#PBS -l walltime=00:30:00
+#PBS -q coc-ice
+#PBS -j oe
+#PBS -o comb_4p_4t.out
+
+export MPI_NUM_PROCS=4
+
+module load gcc/8.3.0 mvapich2/2.3.2 intel/19.0.5
+
+cd ~/shruti/AOS-Project2/mpi
+make clean
+make all
+echo "Standalone MPI with 16 MPI processes" 
+mpirun -np 16 ./mpi2 16
+
+export OMP_NUM_THREADS=4
+export MPV_CPU_BINDING_POLICY=hybrid
+export OMP_PROC_BIND=true
+export VIADEV_USE_AFFINITY=0
+export MV2_ENABLE_AFFINITY=0
+export MV2_THREADS_PER_PROCESS=4
+
+cd ~/shruti/AOS-Project2/combined
+make clean
+make all
+
+echo "MCS Tree barrier"
+cat $PBS_NODEFILE | uniq > hostfile
+mpirun -np 4 -hostfile hostfile ./combined 4 4 100

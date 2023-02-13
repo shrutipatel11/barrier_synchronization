@@ -1,0 +1,26 @@
+#PBS -N mpi_barrier_10
+#PBS -l nodes=1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1+1:ppn=1
+#PBS -l pmem=1gb
+#PBS -l walltime=00:05:00
+#PBS -q coc-ice
+#PBS -j oe
+#PBS -o mpi_10.out
+
+export MPI_NUM_PROCS=10
+echo "Started on `/bin/hostname`"
+echo "Nodes chosen are:"
+cat $PBS_NODEFILE
+
+cd ~/shruti/AOS-Project2/mpi
+
+module load gcc/8.3.0 mvapich2/2.3.2
+
+make clean
+make all
+
+echo "MCS Tree barrier"
+mpirun -np 10 ./mpi1 10
+
+sleep 4
+echo "Dissemination barrier"
+mpirun -np 10 ./mpi2 10

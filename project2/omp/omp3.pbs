@@ -1,0 +1,25 @@
+#PBS -N omp_barrier_3
+#PBS -l nodes=1:ppn=3
+#PBS -l pmem=1gb
+#PBS -l walltime=00:05:00
+#PBS -q coc-ice
+#PBS -j oe
+#PBS -o omp_barrier_3.out
+
+echo "Started on `/bin/hostname`"
+echo "Nodes chosen are:"
+
+cd ~/shruti/AOS-Project2/omp
+module load gcc gcc/8.3.0
+
+export OMP_NUM_THREADS=3
+echo "Compiling"
+gcc -fopenmp harness.c gtmp1.c -o mp1
+gcc -fopenmp harness.c gtmp2.c -o mp2
+echo "Compiled"
+
+echo "Counting barrier"
+./mp1 3
+
+echo "MCS tree barrier"
+./mp2 3
